@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Modal, Button } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Button } from 'react-native';
 import teams from './times/times';
 import { router } from 'expo-router';
 
@@ -15,8 +15,8 @@ const handlePress = (team: Team) => {
 };
 
 const SelectTeamScreen: React.FC = () => {
+    
     const [selectedTeams, setSelectedTeams] = useState<Team[]>([]);
-    const [modalVisible, setModalVisible] = useState(false);
     const [longPressTimeout, setLongPressTimeout] = useState<NodeJS.Timeout | null>(null);
 
     const handleSelectTeam = (team: Team) => {
@@ -24,29 +24,28 @@ const SelectTeamScreen: React.FC = () => {
             handlePress(team);
             return;
         }
-        if (longPressTimeout) {
-            clearTimeout(longPressTimeout);
-            setLongPressTimeout(null);
-            setSelectedTeams((prev) => [...prev, team]);
-        } else {
-            setSelectedTeams((prev) => {
-                const alreadySelected = prev.some((t) => t.name === team.name);
-                if (alreadySelected) {
-                    return prev.filter((t) => t.name !== team.name);
-                } else if (prev.length === 2) {
-                    return [prev[0], team];
-                } else {
-                    return [...prev, team];
-                }
-            });
-        }
+        setSelectedTeams((prev) => {
+            const alreadySelected = prev.some((t) => t.name === team.name);
+            if (alreadySelected) {
+                return prev.filter((t) => t.name !== team.name);
+            } else if (prev.length === 2) {
+                return [prev[0], team];
+            } else {
+                return [...prev, team];
+            }
+        });
     };
-
 
     const handleLongPress = (team: Team) => {
         setLongPressTimeout(
             setTimeout(() => {
-                setSelectedTeams((prev) => [...prev, team]);
+                setSelectedTeams((prev) => {
+                    const alreadySelected = prev.some((t) => t.name === team.name);
+                    if (!alreadySelected && prev.length < 2) {
+                        return [...prev, team];
+                    }
+                    return prev;
+                });
             }, 500)
         );
     };
@@ -82,24 +81,6 @@ const SelectTeamScreen: React.FC = () => {
             {selectedTeams.length === 2 && (
                 <Button title="Comparar" onPress={handleComparePress} />
             )}
-            {/* <Modal
-                visible={modalVisible}
-                animationType="slide"
-                transparent={true}
-                onRequestClose={() => setModalVisible(false)}
-            >
-                <View style={styles.modalContainer}>
-                    <View style={styles.modalContent}>
-                        <Text style={styles.modalTitle}>Comparar Títulos</Text>
-                        {selectedTeams.length === 2 && (
-                            <>
-                                <Text>{selectedTeams[0].name} vs {selectedTeams[1].name}</Text>
-                            </>
-                        )}
-                        <Button title="Fechar" onPress={() => setModalVisible(false)} />
-                    </View>
-                </View>
-            </Modal> */}
         </View>
     );
 };
@@ -131,25 +112,7 @@ const styles = StyleSheet.create({
     },
     teamName: {
         fontSize: 18,
-    },
-    modalContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    },
-    modalContent: {
-        width: 300,
-        padding: 20,
-        backgroundColor: 'white',
-        borderRadius: 10,
-        alignItems: 'center',
-    },
-    modalTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 10,
-    },
+    }
 });
 
 export default SelectTeamScreen;
