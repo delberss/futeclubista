@@ -30,8 +30,8 @@ const TeamTitles: React.FC = () => {
                     keyExtractor={(item, index) => index.toString()}
                     renderItem={({ item }) => (
                         <>
-                            <Text style={styles.categoryTitle}>{item[0].charAt(0).toUpperCase() + item[0].slice(1)}</Text>
-                            {item[1].map((title, index) => (
+                            <Text style={styles.categoryTitle}>{item[0]?.charAt(0).toUpperCase() + item[0].slice(1)}</Text>
+                            {item[1]?.map((title, index) => (
                                 <View key={index} style={styles.titleItem}>
                                     <Text style={styles.titleCompetition}>{title.name}</Text>
                                     <Text style={styles.titleYear}>{`${title.count}`}</Text>
@@ -46,7 +46,11 @@ const TeamTitles: React.FC = () => {
     };
 
     if (!team) {
-        return null; // Pode adicionar um componente de carregamento ou mensagem de erro aqui se necessário
+        return (
+            <View style={styles.container}>
+                <Text style={styles.errorText}>Erro ao carregar os detalhes do time.</Text>
+            </View>
+        );
     }
 
     return (
@@ -114,6 +118,10 @@ const styles = StyleSheet.create({
         paddingVertical: 5,
         marginVertical: 10,
         width: '100%',
+    },
+    errorText: {
+        fontSize: 18,
+        color: 'red',
     },
 });
 

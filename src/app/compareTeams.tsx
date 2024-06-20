@@ -27,8 +27,8 @@ const CompareTeamsScreen: React.FC = () => {
         const titlesByCategory: { [category: string]: { name: string }[] } = {};
         categoryOrder.forEach(category => titlesByCategory[category] = []);
 
-        teams.forEach(team => {
-            team.titles.forEach(category => {
+        teams?.forEach(team => {
+            team?.titles?.forEach(category => {
                 Object.entries(category).forEach(([categoryName, titleList]) => {
                     if (titlesByCategory[categoryName]) {
                         titleList.forEach(title => {

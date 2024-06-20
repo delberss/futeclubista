@@ -5,7 +5,7 @@ import { router } from 'expo-router';
 
 type Team = {
     name: string;
-    shield: string; // URL of the team's shield image
+    shield: string;
 };
 
 teams.sort((a, b) => a.name.localeCompare(b.name));
@@ -15,7 +15,6 @@ const handlePress = (team: Team) => {
 };
 
 const SelectTeamScreen: React.FC = () => {
-    
     const [selectedTeams, setSelectedTeams] = useState<Team[]>([]);
     const [longPressTimeout, setLongPressTimeout] = useState<NodeJS.Timeout | null>(null);
 
@@ -46,27 +45,34 @@ const SelectTeamScreen: React.FC = () => {
                     }
                     return prev;
                 });
-            }, 500)
+            }, 100)
         );
+    };
+
+    const handlePressOut = () => {
+        if (longPressTimeout) {
+            clearTimeout(longPressTimeout);
+        }
     };
 
     const handleComparePress = () => {
         router.push({ pathname: "/compareTeams", params: { teams: JSON.stringify(selectedTeams) } });
     };
 
-    const renderTeam = ({ item }: { item: Team }) => (
-        <TouchableOpacity
-            style={[
-                styles.teamItem,
-                selectedTeams.some((t) => t.name === item.name) && styles.selectedTeamItem
-            ]}
-            onPress={() => handleSelectTeam(item)}
-            onLongPress={() => handleLongPress(item)}
-        >
-            <Image source={{ uri: item.shield }} style={styles.shield} />
-            <Text style={styles.teamName}>{item.name}</Text>
-        </TouchableOpacity>
-    );
+    const renderItem = ({ item }: { item: Team }) => {
+        const isSelected = selectedTeams.some((team) => team.name === item.name);
+        return (
+            <TouchableOpacity
+                onPress={() => handleSelectTeam(item)}
+                onLongPress={() => handleLongPress(item)}
+                onPressOut={handlePressOut}
+                style={[styles.item, isSelected && styles.selectedItem]}
+            >
+                <Image source={{ uri: item.shield }} style={styles.shield} />
+                <Text style={styles.name}>{item.name}</Text>
+            </TouchableOpacity>
+        );
+    };
 
     return (
         <View style={styles.container}>
@@ -75,10 +81,10 @@ const SelectTeamScreen: React.FC = () => {
             </Text>
             <FlatList
                 data={teams}
-                keyExtractor={(item) => item.name}
-                renderItem={renderTeam}
+                renderItem={renderItem}
+                keyExtractor={(item) => item?.name}
             />
-            {selectedTeams.length === 2 && (
+            {selectedTeams?.length === 2 && (
                 <Button title="Comparar" onPress={handleComparePress} />
             )}
         </View>
@@ -91,28 +97,32 @@ const styles = StyleSheet.create({
         padding: 16,
     },
     mainTitle: {
-        padding: 10,
-        color: '#003300', // Verde escuro
+        paddingVertical: 10,
+        color: '#003300',
+        fontSize: 16,
+        textAlign: 'center',
     },
-    teamItem: {
+    item: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 8,
-        borderBottomWidth: 1,
-        borderBottomColor: '#ccc',
+        padding: 10,
+        marginBottom: 10,
+        backgroundColor: '#f9f9f9',
+        borderRadius: 8,
     },
-    selectedTeamItem: {
-        backgroundColor: '#ADD8E6', // Cor de fundo azul claro para times selecionados
+    selectedItem: {
+        backgroundColor: '#CDCDCD',
+        borderColor: '#ADD8E6',
     },
     shield: {
-        width: 40,
-        height: 40,
+        width: 50,
+        height: 50,
         marginRight: 16,
         resizeMode: 'contain',
     },
-    teamName: {
+    name: {
         fontSize: 18,
-    }
+    },
 });
 
 export default SelectTeamScreen;

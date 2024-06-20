@@ -3,10 +3,22 @@ import { View, Text, StyleSheet, Image, FlatList, TouchableOpacity, Linking } fr
 import { useLocalSearchParams, router } from 'expo-router';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6'; // Import for icons
 
+type RedeSocial = {
+    nome: string;
+    link: string;
+};
+
+type Team = {
+    name: string;
+    shield: string;
+    fundacao: string;
+    redes: RedeSocial[];
+};
+
 const TeamDetailScreen: React.FC = () => {
     const params = useLocalSearchParams();
     const teamString = Array.isArray(params.team) ? params.team[0] : params.team;
-    const team = teamString ? JSON.parse(teamString) : null;
+    const team: Team | null = teamString ? JSON.parse(teamString) : null;
 
     if (!team) {
         return (
@@ -22,10 +34,12 @@ const TeamDetailScreen: React.FC = () => {
     ];
 
     const handlePress = (topic: string) => {
-        if(topic === 'Títulos'){
-            router.push({ pathname: "/teamTitles", params: { team: JSON.stringify(team) } });
-        } else if (topic === 'Artilheiros da história'){
-            router.push({ pathname: "/teamArtilheiros", params: { team: JSON.stringify(team) } });
+        if (team) {
+            if (topic === 'Títulos') {
+                router.push({ pathname: "/teamTitles", params: { team: JSON.stringify(team) } });
+            } else if (topic === 'Artilheiros da história') {
+                router.push({ pathname: "/teamArtilheiros", params: { team: JSON.stringify(team) } });
+            }
         }
     };
 
@@ -36,7 +50,9 @@ const TeamDetailScreen: React.FC = () => {
     );
 
     const handleSocialPress = (url: string) => {
-        Linking.openURL(url);
+        if (url) {
+            Linking.openURL(url);
+        }
     };
 
     return (
@@ -51,15 +67,21 @@ const TeamDetailScreen: React.FC = () => {
                 style={styles.list}
             />
             <View style={styles.socialContainer}>
-                <TouchableOpacity onPress={() => handleSocialPress(team.redes[0].link)}>
-                    <FontAwesome6 name="facebook" size={40} color="#4267B2" style={styles.socialIcon} />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleSocialPress(team.redes[1].link)}>
-                    <FontAwesome6 name="instagram" size={40} color="#C13584" style={styles.socialIcon} />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleSocialPress(team.redes[2].link)}>
-                    <FontAwesome6 name="x-twitter" size={40} color="black" style={styles.socialIcon} />
-                </TouchableOpacity>
+                {team.redes.length > 0 && (
+                    <TouchableOpacity onPress={() => handleSocialPress(team.redes[0].link)}>
+                        <FontAwesome6 name="facebook" size={40} color="#4267B2" style={styles.socialIcon} />
+                    </TouchableOpacity>
+                )}
+                {team.redes.length > 1 && (
+                    <TouchableOpacity onPress={() => handleSocialPress(team.redes[1].link)}>
+                        <FontAwesome6 name="instagram" size={40} color="#C13584" style={styles.socialIcon} />
+                    </TouchableOpacity>
+                )}
+                {team.redes.length > 2 && (
+                    <TouchableOpacity onPress={() => handleSocialPress(team.redes[2].link)}>
+                        <FontAwesome6 name="x-twitter" size={40} color="black" style={styles.socialIcon} />
+                    </TouchableOpacity>
+                )}
             </View>
         </View>
     );
