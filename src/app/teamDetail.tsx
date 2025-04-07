@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, FlatList, TouchableOpacity, Linking } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6'; // Import for icons
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
 type RedeSocial = {
     nome: string;
